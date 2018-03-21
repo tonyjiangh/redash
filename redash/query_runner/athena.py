@@ -163,7 +163,7 @@ class Athena(BaseQueryRunner):
 
         return schema.values()
 
-    def run_query(self, query, user):
+    def run_query(self, query, user, query_params=None):
         cursor = pyathena.connect(
             s3_staging_dir=self.configuration['s3_staging_dir'],
             region_name=self.configuration['region'],
@@ -175,7 +175,7 @@ class Athena(BaseQueryRunner):
             formatter=SimpleFormatter()).cursor()
 
         try:
-            cursor.execute(query)
+            cursor.execute(query, query_params)
             column_tuples = [(i[0], _TYPE_MAPPINGS.get(i[1], None)) for i in cursor.description]
             columns = self.fetch_columns(column_tuples)
             rows = [dict(zip(([c['name'] for c in columns]), r)) for i, r in enumerate(cursor.fetchall())]
