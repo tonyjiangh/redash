@@ -147,10 +147,10 @@ class Athena(BaseQueryRunner):
         query = """
         SELECT table_schema, table_name, column_name
         FROM information_schema.columns
-        WHERE table_schema NOT IN ('information_schema')
+        WHERE table_schema = '%(schema_name)s'
         """
-
-        results, error = self.run_query(query, None)
+        query_param = {'schema_name': self.configuration.get('schema', 'default')}
+        results, error = self.run_query(query, None, query_param)
         if error is not None:
             raise Exception("Failed getting schema.")
 
